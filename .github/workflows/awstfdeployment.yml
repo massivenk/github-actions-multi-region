@@ -5,6 +5,8 @@ on:
 
 env:
   applicationfolder: SNS
+  AWS_REGION: af-south-1
+  S3BUCKET: terraform-state-massive
 
 jobs:
   build:
