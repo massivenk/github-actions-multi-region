@@ -14,9 +14,10 @@ jobs:
 
   Deploy_Dev:
     needs: Plan_Dev
-    uses: RekhuGopal/gitreusableflows/.github/workflows/aws_tf_appy.yml@develop
+    uses: aws-actions/configure-aws-credentials@v1
     with:
-      path: AWS-Multi-Region-Deployment
+      aws-region: eu-west-1
+      role-to-assume: ${{ secrets.IAMROLE_GITHUB }}
       tf_vars_file: dev.tfvars
       gh_environment: dev
 
