@@ -1,41 +1,22 @@
-name: Build and Deploy
-
+name: "awstfdeployment"
 on:
-  workflow_dispatch: {}
-
-env:
-  applicationfolder: SNS
-  AWS_REGION: eu-west-1
-  S3BUCKET: terraform-state-massive
+  workflow_dispatch:
 
 jobs:
-  build:
-    name: Build and Package
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - uses: actions/checkout@v3
-        name: Checkout Repository
+  Plan_Dev:
+    if: github.ref == 'refs/heads/develop'
+    uses: aws-actions/configure-aws-credentials@v1
+    with:
+      aws-region: eu-west-1
+      role-to-assume: ${{ secrets.IAMROLE_GITHUB }}
 
-      - uses: aws-actions/configure-aws-credentials@v1-node20
-        with:
-          role-to-assume: arn:aws:iam::204931786341:role/github-action-deployment-role
-          role-session-name: GitHub-Action-Role
-          aws-region: eu-west-1
-        
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: Dev
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-    - uses: actions/checkout@v2
-    - uses: aws-actions/configure-aws-credentials@v1-node20
-      with:
-        role-to-assume: ${{ secrets.IAMROLE_GITHUB }}
-        role-session-name: GitHub-Action-Role
-        aws-region: ${{ env.AWS_REGION }}
+
+
+  Deploy_Dev:
+    needs: Plan_Dev
+    uses: RekhuGopal/gitreusableflows/.github/workflows/aws_tf_appy.yml@develop
+    with:
+      path: AWS-Multi-Region-Deployment
+      tf_vars_file: dev.tfvars
+      gh_environment: dev
+
