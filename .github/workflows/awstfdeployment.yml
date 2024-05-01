@@ -1,28 +1,42 @@
-name: "06_AWSMultiRegionDeployment"
+name: Build and Deploy
+
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}
+
+env:
+  applicationfolder: SNS
+  AWS_REGION: secrets.AWS_REGION
+  S3BUCKET: secrets.
+
 
 jobs:
-  Plan_Dev:
-    if: github.ref == 'refs/heads/develop'
-    uses: RekhuGopal/gitreusableflows/.github/workflows/aws_tf_plan.yml@develop
-    with:
-      path: SNS
-      tf_vars_file: dev.tfvars
-      gh_environment: dev
-    secrets:
-      role-to-assume: ${{ secrets.IAMROLE_GITHUB }}
-      role-session-name: GitHub-Action-Role
-      aws-region: ${{ env.AWS_REGION }}
+  build:
+    name: Build and Package
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout Repository
 
-  Deploy_Dev:
-    needs: Plan_Dev
-    uses: RekhuGopal/gitreusableflows/.github/workflows/aws_tf_appy.yml@develop
-    with:
-      path: SNS
-      tf_vars_file: dev.tfvars
-      gh_environment: dev
-    secrets:
-      role-to-assume: ${{ secrets.IAMROLE_GITHUB }}
-      role-session-name: GitHub-Action-Role
-      aws-region: ${{ env.AWS_REGION }}
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.IAMROLE_GITHUB }}
+          role-session-name: GitHub-Action-Role
+          aws-region: ${{ env.AWS_REGION }}
+        
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: Dev
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+    - uses: actions/checkout@v2
+    - uses: aws-actions/configure-aws-credentials@v1
+      with:
+        role-to-assume: ${{ secrets.IAMROLE_GITHUB }}
+        role-session-name: GitHub-Action-Role
+        aws-region: ${{ env.AWS_REGION }}
