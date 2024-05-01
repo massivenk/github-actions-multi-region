@@ -6,5 +6,5 @@ resource "aws_sns_topic" "regional-topic" {
 }
 
 output "sns_topic_arns" {
-  value = aws_sns_topic.example.*.arn
+  value = aws_sns_topic.regional-topic.*.arn
 }
