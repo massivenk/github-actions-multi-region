@@ -1,51 +1,49 @@
-name: "awstfdeployment"
+name: 'AWSTFDeployment'
+
 on:
- push:
- branches:
- - develop
- pull_request:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+
 permissions:
- id-token: write # This is required for aws oidc connection
- contents: read # This is required for actions/checkout
- pull-requests: write # This is required for gh bot to comment PR
-env:
- TF_LOG: INFO
- AWS_REGION: ${{ secrets.AWS_REGION }}
+  id-token: write
+  contents: read
+
 jobs:
- deploy:
- runs-on: ubuntu-latest
- defaults:
- run:
- shell: bash
- working-directory: .
- steps:
- - name: Git checkout
- uses: actions/checkout@v3
- 
- - name: IAM Setup
- uses: aws-actions/configure-aws-credentials@v1
- with:
- role-to-assume: ${{ secrets.AWS_ROLE }}
- aws-region: ${{ secrets.AWS_REGION }}
- role-session-name: GitHub-OIDC-TERRAFORM
- 
- - name: Setup Terraform
- uses: hashicorp/setup-terraform@v2
- with:
- terraform_version: 1.2.5
- 
- - name: Terraform fmt
- id: fmt
- run: terraform fmt -check
- continue-on-error: true
- 
- - name: Terraform Init
- id: init
- env:
- AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
- AWS_BUCKET_KEY_NAME: ${{ secrets.AWS_BUCKET_KEY_NAME }}
- run: terraform init -backend-config="bucket=${AWS_BUCKET_NAME}" -backend-config="key=${AWS_BUCKET_KEY_NAME}" -backend-config="region=${AWS_REGION}"
- 
- - name: Terraform Validate
- id: validate
- run: terraform validate -no-color
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    environment: dev
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Configure aws credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        role-to-assume: arn:aws:iam::204931786341:role/github-action-deployment-role
+        aws-region: eu-west-1
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.4.6
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Format
+      run: terraform fmt -check
+
+    - name: Terraform Plan
+      run: terraform plan -input=false
+
+      # On push to "main", deploy the Terraform infrastructure
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform apply -auto-approve -input=false
+
