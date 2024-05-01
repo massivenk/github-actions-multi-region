@@ -23,6 +23,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v2
       with:
         role-to-assume: arn:aws:iam::204931786341:role/github-action-deployment-role
+        role-session-name: github-actions-role
         aws-region: eu-west-1
 
     - name: Checkout
@@ -39,11 +40,14 @@ jobs:
     - name: Terraform Format
       run: terraform fmt -check
 
+    - name: Destroy terraform stack
+      run: terraform destroy
+
     - name: Terraform Plan
       run: terraform plan -input=false
 
       # On push to "main", deploy the Terraform infrastructure
     - name: Terraform Apply
-      if: github.ref == 'refs/heads/debelop' && github.event_name == 'push'
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false
 
