@@ -1,6 +1,7 @@
-name: "Terraform"
+name: "awstfdeployment"
 
 on:
+  workflow_dispatch: {}
   push:
     branches:
       - develop
