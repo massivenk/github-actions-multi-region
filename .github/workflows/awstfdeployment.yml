@@ -6,13 +6,13 @@ on:
 jobs:
   plan_dev:
     if: github.ref == 'refs/heads/develop'
-    uses: massivenk/actions-workflows-terraform/.github/workflows/aws_tf_plan.yml@develop
+    uses: ./.github/workflows/aws_tf_plan.yml@develop
     with:
       path: aws_tf_plan
 
   deploy_dev:
     needs: plan_dev
-    uses: massivenk/actions-workflows-terraform/.github/workflows/aws_tf_apply.yml@develop
+    uses: ./.github/workflows/aws_tf_apply.yml@develop
     with:
        path: aws_tf_apply
 
