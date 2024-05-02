@@ -6,7 +6,7 @@ on:
 jobs:
   Plan_Dev:
     if: github.ref == 'refs/heads/develop'
-    uses: BeyongIT-AWS/gitreusableflows/.github/workflows/aws_tf_plan.yml@develop
+    uses: BeyongIT-AWS/github-actions-multi-region/.github/workflows/aws_tf_plan.yml@develop
     with:
       path: SNS
       tf_vars_file: dev.tfvars
@@ -18,7 +18,7 @@ jobs:
 
   Deploy_Dev:
     needs: Plan_Dev
-    uses: BeyongIT-AWS/gitreusableflows/.github/workflows/aws_tf_appy.yml@develop
+    uses: BeyongIT-AWS/github-actions-multi-region/.github/workflows/aws_tf_appy.yml@develop
     with:
         role-to-assume: arn:aws:iam::204931786341:role/github-action-deployment-role
         role-session-name: github-actions-role
