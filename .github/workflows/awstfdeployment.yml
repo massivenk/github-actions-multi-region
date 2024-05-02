@@ -1,20 +1,20 @@
-name: 'AWSTFDeployment'
+name: AWS Multi Region Deployment
 
 on:
-  push:
-    branches:
-     - develop
-  pull_request:
-    branches:
-     - develop
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 jobs:
   plan_dev:
-     runs-on: ubuntu-latest
-       if:
- 
+    if: github.ref == 'refs/heads/main'
+    uses: massivenk/actions-workflows-terraform/.github/workflows/aws_tf_plan.yml@develop
+    with:
+      path: aws-resources
 
+  deploy_dev:
+    needs: plan_dev
+    uses: massivenk/actions-workflows-terraform/.github/workflows/aws_tf_apply.yml@develop
+    with:
+       path: aws-resources
 
 
 
