@@ -8,10 +8,12 @@ jobs:
     if: github.ref == 'refs/heads/develop'
     uses: BeyongIT-AWS/github-actions-multi-region/.github/workflows/aws_tf_plan.yml@develop
     with:
-      path: SNS
+      role-to-assume: arn:aws:iam::204931786341:role/github-action-deployment-role
+      role-session-name: github-actions-role
+      aws-region: eu-west-1
+    path: SNS
       tf_vars_file: dev.tfvars
       gh_environment: dev
-    steps:
     - name: Configure aws credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
@@ -23,40 +25,13 @@ jobs:
     needs: Plan_Dev
     uses: BeyongIT-AWS/github-actions-multi-region/.github/workflows/aws_tf_appy.yml@develop
     with:
+        role-to-assume: arn:aws:iam::204931786341:role/github-action-deployment-role
+        role-session-name: github-actions-role
+        aws-region: eu-west-1
+    with:
       path: SNS
       tf_vars_file: dev.tfvars
       gh_environment: dev
 
-    steps:
-    - name: Configure aws credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        role-to-assume: arn:aws:iam::204931786341:role/github-action-deployment-role
-        role-session-name: github-actions-role
-        aws-region: eu-west-1
 
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: 1.4.6
-
-    - name: Terraform Init
-      run: terraform init
-
-    - name: Terraform Format
-      run: terraform fmt -check
-
-    - name: Destroy terraform stack
-      run: terraform destroy
-
-    - name: Terraform Plan
-      run: terraform plan -input=false
-
-      # On push to "main", deploy the Terraform infrastructure
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-      run: terraform apply -auto-approve -input=false
 
