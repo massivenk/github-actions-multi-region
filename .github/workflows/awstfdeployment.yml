@@ -6,32 +6,23 @@ on:
 jobs:
   Plan_Dev:
     if: github.ref == 'refs/heads/develop'
-    uses: BeyongIT-AWS/github-actions-multi-region/.github/workflows/aws_tf_plan.yml@develop
-    with:
-      role-to-assume: arn:aws:iam::204931786341:role/github-action-deployment-role
-      role-session-name: github-actions-role
-      aws-region: eu-west-1
-    path: SNS
-      tf_vars_file: dev.tfvars
-      gh_environment: dev
-    - name: Configure aws credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        role-to-assume: arn:aws:iam::204931786341:role/github-action-deployment-role
-        role-session-name: github-actions-role
-        aws-region: eu-west-1
-
-  Deploy_Dev:
-    needs: Plan_Dev
-    uses: BeyongIT-AWS/github-actions-multi-region/.github/workflows/aws_tf_appy.yml@develop
-    with:
-        role-to-assume: arn:aws:iam::204931786341:role/github-action-deployment-role
-        role-session-name: github-actions-role
-        aws-region: eu-west-1
+    uses: BeyongIT-AWS/gitreusableflows/.github/workflows/aws_tf_plan.yml@develop
     with:
       path: SNS
       tf_vars_file: dev.tfvars
       gh_environment: dev
+      role-to-assume: arn:aws:iam::204931786341:role/github-action-deployment-role
+      role-session-name: github-actions-role
+      aws-region: eu-west-1
+
+
+  Deploy_Dev:
+    needs: Plan_Dev
+    uses: BeyongIT-AWS/gitreusableflows/.github/workflows/aws_tf_appy.yml@develop
+    with:
+        role-to-assume: arn:aws:iam::204931786341:role/github-action-deployment-role
+        role-session-name: github-actions-role
+        aws-region: eu-west-1
 
 
 
