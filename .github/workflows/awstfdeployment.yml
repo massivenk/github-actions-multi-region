@@ -1,22 +1,31 @@
 name: 'AWSTFDeployment'
 
 on:
-  push:
-    branches: [ "develop" ]
-  pull_request:
-
-permissions:
-  id-token: write
-  contents: read
+  workflow_dispatch:
 
 jobs:
-  terraform:
-    name: 'Terraform'
-    runs-on: ubuntu-latest
-    environment: dev
-    defaults:
-      run:
-        shell: bash
+  Plan_Dev:
+    if: github.ref == 'refs/heads/develop'
+    uses: BeyongIT-AWS/github-actions-multi-region/.github/workflows/aws_tf_plan.yml@develop
+    with:
+      path: SNS
+      tf_vars_file: dev.tfvars
+      gh_environment: dev
+    steps:
+    - name: Configure aws credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        role-to-assume: arn:aws:iam::204931786341:role/github-action-deployment-role
+        role-session-name: github-actions-role
+        aws-region: eu-west-1
+
+  Deploy_Dev:
+    needs: Plan_Dev
+    uses: BeyongIT-AWS/github-actions-multi-region/.github/workflows/aws_tf_appy.yml@develop
+    with:
+      path: SNS
+      tf_vars_file: dev.tfvars
+      gh_environment: dev
 
     steps:
     - name: Configure aws credentials
