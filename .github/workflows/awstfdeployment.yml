@@ -4,7 +4,6 @@ on:
   workflow_call:
 
 jobs:
-  resuable_workflow_job:
      runs-on: ubuntu-latest
   Plan_Dev:
     if: github.ref == 'refs/heads/develop'
