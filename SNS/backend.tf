@@ -8,7 +8,7 @@ terraform {
 aws = {
    source  = "hashicorp/aws"
    version = "~> 4.18.0"
-   region = af-south-1}
+   region = eu-west-1}
    }
 }
   backend "s3" {
