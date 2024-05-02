@@ -1,29 +1,22 @@
 name: 'AWSTFDeployment'
 
 on:
-  workflow_call:
+  push:
+    branches:
+     - develop
+  pull_request:
+    branches:
+     - develop
+  workflow_dispatch:
 
 jobs:
+  plan_dev:
      runs-on: ubuntu-latest
-  Plan_Dev:
-    if: github.ref == 'refs/heads/develop'
-    uses: BeyongIT-AWS/github-actions-multi-region/.github/workflows/aws_tf_plan.yml@develop
-    with:
-      config-path: SNS
-      gh_environment: dev
-      tf_vars_file: dev.tfvars
-      role-to-assume: arn:aws:iam::204931786341:role/github-action-deployment-role
-      role-session-name: github-actions-role
-      aws-region: eu-west-1
+       if:
+ 
 
 
-  Deploy_Dev:
-    needs: Plan_Dev
-    uses: BeyongIT-AWS/github-actions-multi-region/.github/workflows/aws_tf_appy.yml@develop
-    with:
-        role-to-assume: arn:aws:iam::204931786341:role/github-action-deployment-role
-        role-session-name: github-actions-role
-        aws-region: eu-west-1
+
 
 
 
